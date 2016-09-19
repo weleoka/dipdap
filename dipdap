@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+"""
+DipDap - a simple tool to manage a library database.
+
+DipDap can add books to a database.
+Users can also rate the book and assign it a genre.
+
+The default database file is a CSV file.
+This will later be able to be changed in the config part of DipDap.
+
+Dipdap can write books out into a human readable list file.
+
+An entry in the database takes the form:
+
+[Title(str), Author(str), Genre(int), Genre2(int), 
+    Date finished(timestamp), Score(int), Comments(str)]
+
+- The score is simply from 1 - 5.
+
+- Genre is simply genre.
+
+- Genre2 is what type of book under that genre. So under fiction there could be horror, teen, detektive, fantasy, sci-fi etc. Under textbooks/fact-books there could be engineering, mathematics, biology and computer science for example.
+
+
+
+Please report any issues to kawe0049@nothing.yet
+
+
+Comments in syntax #-> ar in fact tags for items on the do/wish list.
+Generate the pydocs and then hunt the do/wish tags down,
+you can then jump straight in there and start improving! 
+
+
+"""
+
+import os, sys
+from time import sleep
+
+import dd_utils.filesystem
+import dd_utils.proc
+import dd_utils.prompt
+
+import dd_html.header
+import dd_html.footer
+import dd_html.forms
+import dd_html.config
+from dd_utils.general import clear_screen as ddcls
+
+import dd_main.forms
+from dd_main import config as conf
+
+
+def startpoint ():
+    """ Startpoint function.
+
+    The function from which all else takes place.
+
+    parameters:
+        void
+
+    return:
+        boolean
+    """
+    # Default human readable list file.
+    list_file =  conf.run['human_readable_dump_file']
+    database_type = conf.run['database_type']
+
+    if database_type == "csv":
+        # Default indexing file.
+        DATABASE = conf.run['database_name']
+
+    elif database_type == "sql":
+        print ("SQL Database not supported.")
+        return False
+
+    # Make the initial refreshing of the main menu.
+    option = False
+    ddcls()
+
+    while True:
+
+        if option:
+            option = input('Enter option: ')
+
+        option = option if option in ['1', '2', '3', '4', '9'] else False
+
+    # Refresh the main menu.
+    # [1] Add entry to database using terminal.
+    #  -  Search by title
+    #  -  Start GUI (Add entry and search by title, also a quit button.)
+    # [2] Compile human readable file of entries already in database.
+    #  -  Start socket server.
+    # [3] Output HTML form.
+    #  -  Start CGI web server.
+    # [4] Print complete database to terminal.
+    # [9] Quit.
+        if not option:
+            dd_utils.prompt.get_main_menu()
+            option = True
+
+        if not os.path.isfile(DATABASE) and option in ['2', '4']:
+            print("\nCant find the database file '%s' specified.\n"
+                % (db_file))
+            option, DATABASE = dd_utils.prompt.specify_db_file()
+
+
+    # Add entries to database.
+        elif option == "1":
+            option = False # Reset the option.
+
+            if dd_utils.filesystem.check_file_status(DATABASE):
+                rawinput = dd_utils.prompt.generate_form(dd_main.forms.new_book_form)
+                entry = dd_utils.proc.create_db_entry(rawinput, database_type)
+                dd_utils.filesystem.append_to_file(entry, DATABASE)
+
+                print("\nDone! Returning to main menu...")
+                sleep(3)
+                ddcls()
+
+            else:
+                print("\nNon-valid path <%s>. Returning to main menu...\n"
+                    % (path_to_device))
+                sleep(2)
+                ddcls()
+
+
+    # Sort the database and make a human readable list of all entries.
+        elif option == "2":
+            ddcls()
+            option = False # Reset the option.
+
+            while True:
+                list_file = input('\nGive the new list file a file name: ')    # Use specified or query for new.
+
+                description = input('\nGive the new list a description (or leave blank): \n')
+
+                if list_file != '': break
+
+            if (sorting_option and list_file and description) is not None:
+                # Check if file exists. If not create empty with initial_line.
+                initial_line = "\tMade using DipDap library tool!\n" + description + "\n"
+                dd_utils.filesystem.check_file_status(list_file, initial_line)
+                # Output the list file
+                dd_utils.proc.output_list_file(DATABASE, list_file, sorting_option)
+
+            else:
+                print("\nReturned to main menu.\n")
+
+
+    # Print HTML
+        elif option == "3":
+            ddcls()
+            option = False # Reset the option.
+
+            html = []
+            html.append(dd_html.header.get_header())
+            html.append(dd_html.forms.make_form(dd_main.forms.new_book_form))
+            html.append(dd_html.footer.get_footer())
+            print(''.join(html))
+            sleep(3)
+
+
+    # Print indexing file to current terminal window.
+        elif option == "4":
+            ddcls()
+            option = False # Reset the option.
+            print("\nPrinting the index to screen.\n")
+
+            for line in open(DATABASE):    # open under default flag -r
+                print(line)
+
+
+    # Quit DipDap.
+        elif option == "9":
+            ddcls()
+            print("\nShutting down... Thanks for using DipDap.\n")
+
+            break # Break the while True loop at top.
+
+    return True # Final death sentence... but positive outcome.
+
+
+
+if __name__ == "__main__":
+    # Call main/startpoint function.
+    sys.exit(startpoint())
+
+
+# Notes:
+# print(datetime.fromtimestamp(os.path.getmtime(result)).strftime("%d%b%Y %H:%M:%S"))
