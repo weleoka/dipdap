@@ -12,9 +12,11 @@ import dd_html.elements
 def make_form(form_data):
     """
     Generate an HTML5 form.
-
-    #-> Need a way to sort the elements!
-    #   Maybe have element number instead of name.
+    
+    The solution for sorting the elements by incrementing name.
+    
+    This means the element has to follow specific naming rules.
+    "el-[integer]"
 
     parameters:
         form_data: list. All the form data.
@@ -28,23 +30,31 @@ def make_form(form_data):
     action = form_data[0]
     method = form_data[1]
     elements = form_data[2]
-
     form_html = ['\n<form action="%s" method="%s">' % (action, method)]
+    i = 1
 
-
-    for element_name in elements:
-        element_data = elements.get(element_name)
+    while i < len(elements):
+        i += 1
+        element_data = elements['el-%s' % (i)]
         element_label = element_data.get('label')
         attributes = element_data.get('attributes')
         element_id = attributes.get('id')
         element_html = ['\n\t<label for="%s">%s</label>' % (element_id, element_label)]
 
-        if attributes['type'] == 'text':
+        if attributes['type'] in ['text', 'select', 'datetime', 'textfield']:
+            att_type = attributes['type']
+        
+        else:
+
+            raise ('Incorrect element type: ')
+
+
+        if att_type == 'text':
             element_html.append('\n\t<input ')
             element_html += dd_html.elements.get_header(attributes)
             element_html.append('/>\n') # Close the element.
 
-        elif attributes['type'] == 'select':
+        elif att_type == 'select':
             element_html.append('\n\t<select ')
             element_html += dd_html.elements.get_header(attributes)
             element_html += dd_html.elements.gen_select_options_from_list(attributes) # Combine with options list.

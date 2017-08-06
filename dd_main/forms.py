@@ -12,7 +12,7 @@ Generally a book entry should hold the following informaton:
     'author': author,
     'genre': genre,
     'genre2': genre2,
-    'finish_date': finish_date,
+    'read': read,
     'score': score,
     'comment': comment
 
@@ -21,6 +21,7 @@ To_do:
 #-> Elements grouped under an 'elements' key for better logic.
 #-> Genre should be read from a database/file to facilitate modification.
 """
+
 
 # Don't change the order of these, add to the end! The db works by list index.
 genre = [
@@ -44,49 +45,86 @@ genre = [
     ('undef.', 'undef.')
 ]
 
+score = [
+    ('1', '1'),
+    ('2', '2'),
+    ('3', '3'),
+    ('4', '4'),
+    ('5', '5')
+]
+
+# el-[integer] The script will increment the integer and hence outputs low to high.
 new_book_form = (
     './ddcgi.py', # HTML Submit action.
     'post',  # HTML Submit method.
     {
-        'element-1': {
+        'el-1': {
             'label': 'Title: ',
             'attributes': {
                 'id': 'input_title',
-                'class': '',
+                'class': 'nb_ele',
                 'type': 'text',
-                'name': 'title',
-                'class': 'input',
-                'value': ''
+                'name': 'title'
             },
-            'validation': ['not-empty', 'string'],
+            'validation': ['not-empty',],
             'messages': ''
         },
-        'element-2': {
+        'el-2': {
             'label': 'Author: ',
             'attributes': {
                 'id': 'input_author',
-                'class': '',
+                'class': 'nb_ele',
                 'type': 'text',
-                'name': 'author',
-                'class': 'input',
-                'value': ''
+                'name': 'author'
             },
-            'validation': ['pass'],
+            'validation': ['not-empty'],
             'messages': 'I am a little message...'
-
         },
-        'element-3': {
+        'el-3': {
             'label': 'Genre: ',
             'attributes': {
                 'id': 'input_genre',
-                'class': '',
+                'class': 'nb_ele',
                 'type': 'select',
                 'name': 'genre',
-                'class': 'input_select',
                 'options': genre
             },
             'validation': ['not-empty', 'select-list'],
             'messages': 'Fool! IT cannot be empty.'
+        },
+        'el-4': {
+            'label': 'Score: ',
+            'attributes': {
+                'id': 'input_score',
+                'class': 'nb_ele',
+                'type': 'text',
+                'name': 'score',
+                'range': (1, 5)
+            },
+            'validation': ['not-empty', 'number'],
+            'messages': ''
+        },
+        'el-5': {
+            'label': 'Finished (DDMMYYYY) : ',
+            'attributes': {
+                'id': 'input_finish',
+                'class': 'nb_ele',
+                'type': 'text',
+                'name': 'finish'
+            },
+            'validation': ['not-empty', 'datetime'],
+            'messages': ''
+        },
+        'el-6': {
+            'label': 'Comments: ',
+            'attributes': {
+                'id': 'input_comments',
+                'class': 'nb_ele',
+                'type': 'text',
+                'name': 'comments'
+            },
+            'validation': ['pass'],
+            'messages': ''
         }
     }
 )

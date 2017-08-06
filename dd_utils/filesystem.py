@@ -103,33 +103,10 @@ def append_to_file(entry, destination):
     return:
         void
     """
+    print ("Entry: %s" % (entry))
     myfile = open(destination, 'a')
-    myfile.write(entry)
+    myfile.write(str(entry))
     myfile.close()
-
-
-def walk_device(path_to_device, filesuffix):
-    """
-    Walk the device's directory tree and add files matching the criteria to list.
-
-    parameters:
-        path_to_device: string. Root path to work from.
-        filesuffix: string. The file suffixes to list.
-
-    return:
-        results: list. The list of all files of specific filesuffix found.
-    """
-    results = []
-
-    for root, dirnames, filenames in os.walk(path_to_device):
-
-        for filename in fnmatch.filter(filenames, '*.' + filesuffix):
-            results.append(os.path.join(root, filename))    
-
-    print("Found %s files with ending: %s"
-        % (len(results), filesuffix))
-
-    return results
 
 
 def read_library_file(source):
@@ -147,8 +124,9 @@ def read_library_file(source):
     t = []
 
     for line in open(source):    # open under default flag -r
+        arr = []
 
-        if not line in ['\n', '\r\n']: # Ignore empty lines.
+        if line not in ['\n', '\r\n']: # Ignore empty lines.
             arr = re.split(', ', line)
              
         t.append(arr)

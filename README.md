@@ -1,12 +1,18 @@
-Genre is in a list of tuples because lists stay ordered by index... Like this we can add to the genre list later.
+Genre is in a list of tuples because lists stay ordered by index... Like this we can add to the genre list later. The valid genre vs. sub-genre should be in a database relation or at least a file so dynamic addition of genra is possible.
 
 The function for generating html from genre list is noteworthy and avoids having to sort the list in any way, and also makes adding to it very easy.
+
+Because the form elements are at base a python dictionary they can appear in any order on a form. For the developer to decide which order the elements are output, the element header is "el-[integer]". Where 'integer' is then incremented and defines order in an ascending or descending manner.
 
 
 ### DipDap versions
 v0.0.1 (current)
 
-(Note to author: version specified in readme.md, changelog.md, and git.)
+(Note to author: version specified in:
+    main.config, 
+    README.md, 
+    CHANGELOG.md, 
+    repository tag)
 
 
 
@@ -14,14 +20,13 @@ v0.0.1 (current)
 Python 3.4
 
 
-
 ### Overview
 DipDap - a simple tool to manage a library database.
 
-Discdex can add books to a database. Users can also rate the book and assign it a genre.
+DipDap can add books to a database. Users can also rate the book and assign it a genre and sub-genre.
 
 The default database file is a CSV file.
-This will later be able to be changed in the config part of discdex
+This will later be able to be changed in the config part of dipdap.
 
 An entry in the database takes the form:
 
@@ -44,39 +49,13 @@ Please report any issues to kawe009@nothing.yet
 
 
 ### Usage
-Pre-launch: make sure the filetypes you want to index are specified in the config-part of discdex.py, use wildcard * to index all files.
 
-1. Go to the home folder of discdex in a terminal and run as shell script "./discdex.py".
-2. Follow menu instructions.
-3. Let the work be done by discdex!
 
 
 ### Current Features:
 General functinality:
 
-* Walk a directory (recursive) and its subdirectories and record file metadata.
-* Looks for mounted file systems and gives a list to choose from.
-* Checks if path is valid before scanning.
-* Checks to see if the indexing file exists - then creates it or appends to it.
-* Filter files on specified file suffixes or wildcard(*).
-* Save information on
-    - Path to device (supplied by user at prompt)
-    - Location device name (supplied by user at prompt)
-    - Path to file
-    - Name of file
-    - File suffix
-    - Date modified
-    - Size
-
-* Make a human readable list of all the entries in the indexing file.
-    - Sort alphabetically
-    - Sort alphabetically, group by device name.
-
-* Export indexing as .CSV (Comma Separated Values) file for easy porting to databases.
-
 Specs and options:
-
-* Easy file suffix filter parameters in config.
 
 
 
@@ -86,36 +65,22 @@ Please report an issue if one is found.
 
 Functionality:
 
-* Extract metadata from multimedia files. Needs to import module like Hachoir which can read metadata of various files. Interesting data could be:
-	- Duration
-	- Encoding/codec
-	- Bitrate
-* Format printing of index to terminal.
-* If no data is written to the sorted list file because the indexing file is empty then it should be deleted.
-* Description and genre columns in data.
-
 Specs and options:
-
-* A choice of the file metadata to include in the indexing system.
-* When using wildcard "*" to index files of all suffixes the filecount for each respective ending come across is not reported to user. One solution is a key-value pair ticker counter in the "walk_device" function.
 
 Security:
 
-* Encrypted indexing file.
-
 Code, style and performance:
-
-* Exceptions in a try-catch should be named so as not to prevent bubbling up and informing of un-planned for errors.
 
 
 
 ### Contributing
 
-If you'd like to contribute to Discdex's development, start by forking the GitHub repo:
+If you'd like to contribute to DipDep's development, start by forking the GitHub repo:
 
-https://github.com/weleoka/discdex.git
+https://github.com/weleoka/dipdep.git
 
-Have a look at the known issues and missing features and take a pick or find something else that needs doing.
+Have a look at the known issues and missing features and take a pick or find something else that needs doing. 
+You jump right on the wishlist/joblist by finding tagged items in the source code. Run pydoc and then searching for the '#->' tags! 
 
 The best way to get your changes merged is as follows:
 
@@ -124,50 +89,7 @@ The best way to get your changes merged is as follows:
 3. If you are adding significant new functionality, document it in the README
 4. Do not change the version number, I will do that on my end
 5. Push the repo up to GitHub
-6. Send a pull request to [weleoka/discdex](https://github.com/weleoka/discdex)
-
-
-
-#### SQL and using the .csv file exported by Discdex
-An example of the SQL query to create the table in a MySQL database is as follows:
-
-```SQL
-USE dbteknik;
-
-CREATE  TABLE IF NOT EXISTS `mydb`.`Discdex`
-(
-    `id` INT NOT NULL AUTO_INCREMENT ,
-    `path_to_device` VARCHAR(255) NULL ,
-    `device_name` VARCHAR(255) NULL ,
-    `path_to_file` VARCHAR(255) NULL ,
-    `file_name` VARCHAR(255) NULL ,
-    `file_suffix` VARCHAR(255) NULL ,
-    `modified` BIGINT NULL ,
-    `size` BIGINT NULL ,
-    PRIMARY KEY (`id`)
-)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-```
-
-Then load the data into the table from the .csv file which Discdex generated.
-
-```SQL
-LOAD DATA INFILE '/path/to/your/csv/file/model.csv'
-INTO TABLE mydb.Discdex
-FIELDS TERMINATED BY ','
-LINES TERMINATED BY '\n'
- (
-    `path_to_device`,
-    `device_name`,
-    `path_to_file`,
-    `file_name`,
-    `file_suffix`,
-    `modified`,
-    `size`
-);
-
-```
+6. Send a pull request to [weleoka/dipdap](https://github.com/weleoka/dipdap)
 
 
 
@@ -183,11 +105,4 @@ Copyright (c) 2016 A.K. Weeks
 
 ### Sources, inspiration and notes
 Credits go to docs.python.org, stackoverflow.com
-
-How to use hachoir metadata parser:
-https://github.com/jgstew/file-meta-data
-
-Source code for hachoir:
-https://bitbucket.org/haypo/hachoir/wiki/hachoir-metadata
-
 

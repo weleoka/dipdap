@@ -1,4 +1,106 @@
 
+email_in = {
+'server': 'imap.gmail.com', 
+'port': 993,
+'timeout': 5,
+'email': '@gmail.com',
+'password': '',
+'ssl': True
+}
+
+statistics = {
+'file': 'path to statistcs file/database',
+'data_categories': ['mail', 'binary', 'headers', 'request'],
+'volume_data_in': 'make function read/write from log file',
+'volume_data_out': 'make function read/write from log file'
+}
+
+basicLog = {
+'level': 'debug', #critical, error, warning, info, debug and none.
+'file': 'log/dipdap.log',
+#'file': '/dev/stdout', #set to /dev/stdout to print to cosole or pipe.
+'format': '%(asctime)s %(name)s <%(levelname)s> %(message)s',
+'dateformat': '%m/%d/%Y %I:%M:%S %p'
+}
+
+
+
+
+
+
+
+
+
+"""
+'''
+from dipdap import logging_tools
+advLog = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+    'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+        'default': {
+            'format': '%(asctime)s <%(name)s> %(levelname)s %(message)s'
+        }
+    },
+    'filters': {
+        'myfilter': {
+            '()': logging_tools.MyFilter,
+            'param': 'noshow'
+        }
+    },
+    'handlers': {
+        'data_in':{
+            # The values below are popped from this dictionary and
+            # used to create the handler, set the handler's level and
+            # its formatter.
+            '()': logging_tools.owned_file_handler,
+            'level':'DEBUG',
+            'formatter': 'default',
+            # The values below are passed to the handler creator callable
+            # as keyword arguments.
+            'owner': ['pulse', 'pulse'],
+            'filename': 'chowntest.log',
+            'mode': 'w',
+            'encoding': 'utf-8'
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'filters': ['myfilter']
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'dipdap.logging_tools.AdminEmailHandler',
+            'filters': ['special']
+        },
+    },
+    'loggers': {
+        'root': {
+            'handlers':['file'],
+            'propagate': False,
+            'level':'INFO'
+        },
+        'default': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False
+        },
+        'myproject.custom': {
+            'handlers': ['console', 'mail_admins'],
+            'level': 'INFO',
+            'filters': ['special']
+        }
+    }
+}
+'''
+"""
+
+
 def sort_list_of_tuples(data, sort_mode):
     """
     Take the x in tuple (x, y) and sort them according to sort_mode.
@@ -159,6 +261,7 @@ def sorting_option():
                     : null)
                 . ">{$optText}</option>\n";
         }
+    }
 
         return <<<EOD
 <p>
@@ -193,3 +296,29 @@ EOD;
 
 </html>
 '''
+
+"""
+
+
+def walk_device(path_to_device, filesuffix):
+    """
+    Walk the device's directory tree and add files matching the criteria to list.
+
+    parameters:
+        path_to_device: string. Root path to work from.
+        filesuffix: string. The file suffixes to list.
+
+    return:
+        results: list. The list of all files of specific filesuffix found.
+    """
+    results = []
+
+    for root, dirnames, filenames in os.walk(path_to_device):
+
+        for filename in fnmatch.filter(filenames, '*.' + filesuffix):
+            results.append(os.path.join(root, filename))    
+
+    print("Found %s files with ending: %s"
+        % (len(results), filesuffix))
+
+    return results

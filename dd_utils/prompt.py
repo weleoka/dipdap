@@ -12,10 +12,9 @@ import dd_utils.proc
 def generate_form(form_data):
     """
     Generate a form which is filled in on the commandline.
-
-    #-> Need a way to sort the elements!
-    #   Maybe have element_number instead of element_name.
     
+    #-> Not DRY. The testing for imput validity repeats itself. Logic definitely be moved to validate_data_in()
+
     parameters:
         form_data: list. All the form data.
             [0] - submit action.
@@ -25,56 +24,71 @@ def generate_form(form_data):
     return:
         html: string. All the form in one string.
     """
+    i = 0
     elements = form_data[2]
     new_db_entry = []
 
-    for element_name in elements:
-        element_data = elements.get(element_name)
+    while i < len(elements):
+        print (len(elements))
+        i += 1
+        
+        # The solution for sorting the elements by incrementing name.
+        element_data = elements['el-%s' % (i)]
         element_label = element_data.get('label')
-        attributes = element_data.get('attributes')
-        validation = element_data.get('validation')
-        element_name = attributes.get('name')
+        element_attrs = element_data.get('attributes')
+        element_name = element_attrs.get('name')
         validity = False
         msg = ''
+        feedback = ''
 
-        if attributes['type'] == 'text':
+        if element_attrs['type'] in ['text', 'select', 'datetime', 'textfield']:
+            att_type = element_attrs['type']
+        
+        else:
+
+            raise ValueError('Incorrect element type: %s' % (element_attrs.get('type')))
+
+        if att_type == 'text':
 
             while not validity:
-                print(msg)
-                data_in = input('%s: '
-                    % (element_label))
-                validity, msg = dd_utils.proc.validate_data_in(data_in, validation)
+                print(feedback)
+                data_in = input(element_label)
+                validity, feedback = dd_utils.proc.validate_data_in(
+                    data_in,
+                    element_data
+                )
 
-        elif attributes['type'] == 'select':
+        elif att_type == 'select':
             opt_list = [] # Options list.
-            options = attributes.get('options') # The raw data of options.
-            i = 0 # Keep track of genre by list index! Could instead be line number, unique ID etc...
-            tmp_genre_arr = [] # Keep track of main genres found.
+            options = element_attrs.get('options') # The raw data of options.
+            j = 0 # Keep track of option by list index! Could instead be line number, unique ID etc...
+            tmp_cat_arr = [] # Keep track of categories found.
 
-            while i < len(options):
-                genre, genre2 = options[i]
-                i += 1
-
-                # First instance of 'genre' found? Stick it in the opt_list alone!
-                if genre not in tmp_genre_arr:
-                    tmp_genre_arr.append(genre)
+            while j < len(options):
+                cat, cat2 = options[j]
+                
+                # First instance of 'cat' found? Stick it in the opt_list alone!
+                if cat not in tmp_cat_arr:
+                    tmp_cat_arr.append(cat)
                     opt_list.append('\n') # Can't combine appends.. because? :)
-                    opt_list.append(genre)
+                    opt_list.append(cat)
 
-                ind = opt_list.index(genre) # Find index of main genre.
+                tmp_opt_arr = ['\n\t\t[%i] %s' % (j, cat2)]
 
-                tmp_opt_arr = ['\n\t\t[%i] %s' % (i, genre2)]
-
-                opt_list.insert(ind + 1 , ''.join(tmp_opt_arr)) # Insert sub genre after main genre.
+                ind = opt_list.index(cat) # Find index of main category.
+                opt_list.insert(ind + 1 , ''.join(tmp_opt_arr)) # Insert sub cat after main cat.
+                j += 1
 
             print (''.join(opt_list))
 
             while not validity:
-                print(msg)
-                data_in = input('%s: '
-                    % (element_label))
-                validity, msg = dd_utils.proc.validate_data_in(data_in, validation, options)
-
+                print(feedback)
+                data_in = input(element_label)
+                validity, feedback = dd_utils.proc.validate_data_in(
+                    data_in,
+                    element_data
+                )
+   
         # Add the (element_name, data) tuple to list.
         new_db_entry.append((element_name, data_in))
 

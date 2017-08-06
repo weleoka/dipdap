@@ -16,7 +16,11 @@ def gen_select_options_from_list(attributes):
     """
     Generate the options list for a select dropdown list.
 
-    Two tiers deep, so two layer of options with dependencies..
+    Two tiers deep, so data in (parent, child) tuples.
+
+    The child options are grouped by parent in the resulting list, 
+
+    #-> Child options in decreasing value order, should be increasing.
 
     parameters:
         attributes: dict. All the emlements attributes.
@@ -30,9 +34,8 @@ def gen_select_options_from_list(attributes):
     tmp_genre_arr = [] # Keep track of main genres found.
 
     while i < len(options):
-        genre, genre2 = options[i]
-        i += 1
-
+        genre, genre2 = options[i] # Get the data from tuples.
+        
         # First instance of 'genre' found? Stick it in the html list alone!
         if genre not in tmp_genre_arr:
             tmp_genre_arr.append(genre)
@@ -49,6 +52,7 @@ def gen_select_options_from_list(attributes):
         tmp_opt_arr.append('>%s</option>' % (genre2))
 
         opt_html.insert(ind + 1 , ''.join(tmp_opt_arr)) # Insert sub genre after main genre.
+        i += 1 # Increment the current index number.
 
     return ''.join(opt_html)
 
@@ -85,6 +89,10 @@ def get_header(attributes):
 
     The element header are all the attributes enclosed in < and />.
 
+    Some attributes should not be parsed into header.
+        options- that's the options for a select list.
+        range - that's an integer range tuple (min,max).
+
     parameters:
         attributes: dict. All the emlements attributes.
 
@@ -95,7 +103,7 @@ def get_header(attributes):
 
     for attribute, value in attributes.items():
 
-        if attribute == 'options':
+        if attribute in ['options', 'range']:
 
             continue
 

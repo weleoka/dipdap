@@ -61,13 +61,13 @@ def startpoint ():
     return:
         boolean
     """
-    # Default human readable list file.
-    list_file =  conf.run['human_readable_dump_file']
-    database_type = conf.run['database_type']
+    # Human Readable List File, hrlf, a database dump file.
+    hrlf =  conf.db['dump_file'] 
+    database_type = conf.db['type']
 
     if database_type == "csv":
         # Default indexing file.
-        DATABASE = conf.run['database_name']
+        DATABASE = conf.db['name']
 
     elif database_type == "sql":
         print ("SQL Database not supported.")
@@ -110,7 +110,7 @@ def startpoint ():
 
             if dd_utils.filesystem.check_file_status(DATABASE):
                 rawinput = dd_utils.prompt.generate_form(dd_main.forms.new_book_form)
-                entry = dd_utils.proc.create_db_entry(rawinput, database_type)
+                entry = dd_utils.proc.prepare_db_entry(rawinput)
                 dd_utils.filesystem.append_to_file(entry, DATABASE)
 
                 print("\nDone! Returning to main menu...")
@@ -130,18 +130,19 @@ def startpoint ():
             option = False # Reset the option.
 
             while True:
-                list_file = input('\nGive the new list file a file name: ')    # Use specified or query for new.
+                hrlf = input('\nGive the new list file a file name: ')    # Use specified or query for new.
 
                 description = input('\nGive the new list a description (or leave blank): \n')
 
-                if list_file != '': break
+                if hrlf != '': break
 
-            if (sorting_option and list_file and description) is not None:
+            if (hrlf and description) is not None:
                 # Check if file exists. If not create empty with initial_line.
-                initial_line = "\tMade using DipDap library tool!\n" + description + "\n"
-                dd_utils.filesystem.check_file_status(list_file, initial_line)
+                initial_line = "description" + "\n" + conf.dump_file_column_headers
+                dd_utils.filesystem.check_file_status(hrlf, initial_line)
                 # Output the list file
-                dd_utils.proc.output_list_file(DATABASE, list_file, sorting_option)
+                dd_utils.proc.output_list_file(DATABASE, hrlf)
+                sleep(4)
 
             else:
                 print("\nReturned to main menu.\n")
@@ -161,13 +162,26 @@ def startpoint ():
 
 
     # Print indexing file to current terminal window.
+    #-> Not DRY. dd_utils.output_list_file() can write to 'dev/stout'!
         elif option == "4":
             ddcls()
             option = False # Reset the option.
-            print("\nPrinting the index to screen.\n")
+            print(conf.dump_file_column_headers)
+            dataset = dd_utils.filesystem.read_library_file(DATABASE)
+            ticker = 0
 
-            for line in open(DATABASE):    # open under default flag -r
-                print(line)
+            if dataset is not None:
+
+                for data_arr in dataset:
+                    ticker += 1
+                    entry = '\t\t'.join(data_arr)
+                    print(entry)
+
+                print("\n...Done! Total %i entries found."
+                    % (ticker))
+
+            else:
+                print("The db seems to be empty.")
 
 
     # Quit DipDap.
